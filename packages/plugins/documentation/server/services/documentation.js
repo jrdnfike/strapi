@@ -74,16 +74,25 @@ module.exports = () => {
       return forms;
     },
 
+    getApiDocumentationPath(apiName) {
+      return path.join(strapi.config.appPath, 'src', 'api', apiName, 'documentation');
+    },
+
+    async deleteDocumentation(version) {
+      const apis = Object.keys(strapi.api);
+      for (const apiName of apis) {
+        await fs.remove(path.join(this.getApiDocumentationPath(apiName), version));
+      }
+
+      await fs.remove(path.join(this.getFullDocumentationPath(), version));
+    },
+
     async generateFullDoc() {
       let paths = {};
       const apis = Object.keys(strapi.api);
       for (const apiName of apis) {
         const apiDirPath = path.join(
-          strapi.config.appPath,
-          'src',
-          'api',
-          apiName,
-          'documentation',
+          this.getApiDocumentationPath(apiName),
           this.getDocumentationVersion()
         );
         const apiDocPath = path.join(apiDirPath, `${apiName}.json`);

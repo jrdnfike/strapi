@@ -8,7 +8,7 @@ const buildApiRequests = require('./build-api-requests');
 const buildApiResponses = require('./build-api-responses');
 
 const parsePathWithVariables = routePath => {
-  const parsedPath = pathToRegexp
+  return pathToRegexp
     .parse(routePath)
     .map(token => {
       if (_.isObject(token)) {
@@ -18,8 +18,6 @@ const parsePathWithVariables = routePath => {
       return token;
     })
     .join('');
-
-  return parsedPath;
 };
 
 const getPathParams = routePath => {
