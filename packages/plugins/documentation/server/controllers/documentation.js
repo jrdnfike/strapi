@@ -19,7 +19,7 @@ module.exports = {
     try {
       const docPlugin = strapi.plugin('documentation');
       const service = docPlugin.service('documentation');
-      const docVersions = service.retrieveDocumentationVersions();
+      const docVersions = service.getDocumentationVersions();
       const form = await service.retrieveFrontForm();
 
       ctx.send({
@@ -182,8 +182,9 @@ module.exports = {
   },
 
   async regenerateDoc(ctx) {
-    const service = strapi.plugins.documentation.services.documentation;
-    const documentationVersions = service.retrieveDocumentationVersions().map(el => el.version);
+    const service = strapi.plugin('documentation').service('documentation');
+    const documentationVersions = service.getDocumentationVersions().map(el => el.version);
+
     const {
       request: {
         body: { version },
@@ -217,6 +218,7 @@ module.exports = {
         JSON.stringify(fullDoc, null, 2),
         'utf8'
       );
+
       ctx.send({ ok: true });
     } catch (err) {
       ctx.badRequest(null, admin ? 'documentation.error.regenerateDoc' : 'An error occured');
@@ -228,7 +230,7 @@ module.exports = {
   async deleteDoc(ctx) {
     strapi.reload.isWatching = false;
     const service = strapi.plugins.documentation.services.documentation;
-    const documentationVersions = service.retrieveDocumentationVersions().map(el => el.version);
+    const documentationVersions = service.getDocumentationVersions().map(el => el.version);
 
     const {
       params: { version },
