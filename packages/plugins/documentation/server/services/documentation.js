@@ -56,7 +56,7 @@ module.exports = () => {
         .filter(x => x);
     },
 
-    async retrieveFrontForm() {
+    async getFrontendForm() {
       const config = await strapi
         .store({
           environment: '',
@@ -65,6 +65,7 @@ module.exports = () => {
           key: 'config',
         })
         .get();
+
       const forms = JSON.parse(JSON.stringify(form));
 
       _.set(forms, [0, 0, 'value'], config.restrictedAccess);

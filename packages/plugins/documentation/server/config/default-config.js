@@ -3,7 +3,7 @@
 module.exports = {
   openapi: '3.0.0',
   info: {
-    version: '1.0.0',
+    version: '2.0.0',
     title: 'DOCUMENTATION',
     description: '',
     termsOfService: 'YOUR_TERMS_OF_SERVICE_URL',

@@ -1,4 +1,7 @@
 'use strict';
+
+const cleanSchemaAttributes = require('../clean-schema-attributes');
+
 module.exports = (attributes, route) => {
   const requiredAttributes = Object.entries(attributes)
     .filter(([, val]) => {
@@ -22,7 +25,7 @@ module.exports = (attributes, route) => {
             properties: {
               data: {
                 type: 'object',
-                properties: requestAttributes,
+                properties: cleanSchemaAttributes(requestAttributes),
               },
             },
           },

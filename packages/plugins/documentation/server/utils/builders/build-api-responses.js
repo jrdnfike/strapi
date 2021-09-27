@@ -1,32 +1,10 @@
 'use strict';
 
-const getData = (hasParams, attributes) => {
-  // const requiredAttributes = Object.keys(attributes).filter(key => attributes[key].required);
+const getSchemaData = require('../get-schema-data');
+const cleanSchemaAttributes = require('../clean-schema-attributes');
 
-  if (hasParams) {
-    return {
-      type: 'object',
-      properties: {
-        id: { type: 'string' },
-        attributes: { type: 'object', properties: attributes },
-      },
-    };
-  }
-
-  return {
-    type: 'array',
-    items: {
-      type: 'object',
-      properties: {
-        id: { type: 'string' },
-        attributes: { type: 'object', properties: attributes },
-      },
-    },
-  };
-};
-
-const getMeta = hasParams => {
-  if (hasParams) {
+const getMeta = isSingleEntity => {
+  if (isSingleEntity) {
     return { type: 'object' };
   }
 
@@ -44,7 +22,7 @@ const getMeta = hasParams => {
   };
 };
 
-module.exports = (attributes, route, hasParams = false) => {
+module.exports = (attributes, route, isSingleEntity = false) => {
   let schema;
   if (route.method === 'DELETE') {
     schema = {
@@ -54,8 +32,8 @@ module.exports = (attributes, route, hasParams = false) => {
   } else {
     schema = {
       properties: {
-        data: getData(hasParams, attributes),
-        meta: getMeta(hasParams),
+        data: getSchemaData(isSingleEntity, cleanSchemaAttributes(attributes)),
+        meta: getMeta(isSingleEntity),
       },
     };
   }
