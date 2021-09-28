@@ -2,6 +2,7 @@
 
 const getSchemaData = require('../get-schema-data');
 const cleanSchemaAttributes = require('../clean-schema-attributes');
+const errorResponse = require('../error-response');
 
 const getMeta = isSingleEntity => {
   if (isSingleEntity) {
@@ -44,6 +45,22 @@ module.exports = (attributes, route, isSingleEntity = false) => {
         content: {
           'application/json': {
             schema,
+          },
+        },
+      },
+      '403': {
+        description: 'Forbidden',
+        content: {
+          'application/json': {
+            schema: errorResponse.Error,
+          },
+        },
+      },
+      '404': {
+        description: 'Not found',
+        content: {
+          'application/json': {
+            schema: errorResponse.Error,
           },
         },
       },

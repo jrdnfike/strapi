@@ -39,74 +39,53 @@ const getPathParams = routePath => {
 module.exports = apiName => {
   const attributes = strapi.contentType(`api::${apiName}.${apiName}`).attributes;
   const routes = strapi.api[apiName].routes[apiName].routes;
+
   const paths = routes.reduce(
     (acc, route) => {
       const hasPathParams = route.path.includes('/:');
+      const methodVerb = route.method.toLowerCase();
 
-      if (route.method === 'GET') {
-        const routePath = route.path.includes(':')
-          ? parsePathWithVariables(route.path)
-          : route.path;
+      if (methodVerb === 'get') {
+        const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
 
         // Use pathParams to distinguish between single entity vs list of entities
         const { responses } = buildApiResponses(attributes, route, hasPathParams);
-        _.set(acc.paths, `${routePath}.get.responses`, responses);
-        _.set(acc.paths, `${routePath}.get.tags`, [_.upperFirst(route.info.apiName)]);
+        _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
+        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(route.info.apiName)]);
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.get.parameters`, pathParams);
+          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
         } else {
-          _.set(acc.paths, `${routePath}.get.parameters`, queryParams);
+          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, queryParams);
         }
       }
 
-      if (route.method === 'POST') {
-        const routePath = route.path.includes(':')
-          ? parsePathWithVariables(route.path)
-          : route.path;
+      if (methodVerb === 'post' || methodVerb === 'put') {
+        const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
 
         const { responses } = buildApiResponses(attributes, route, hasPathParams);
         const { requestBody } = buildApiRequests(attributes, route);
 
-        _.set(acc.paths, `${routePath}.post.responses`, responses);
-        _.set(acc.paths, `${routePath}.post.requestBody`, requestBody);
-        _.set(acc.paths, `${routePath}.post.tags`, [_.upperFirst(route.info.apiName)]);
+        _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
+        _.set(acc.paths, `${routePath}.${methodVerb}.requestBody`, requestBody);
+        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(route.info.apiName)]);
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.post.parameters`, pathParams);
+          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
         }
       }
 
-      if (route.method === 'PUT') {
-        const routePath = route.path.includes(':')
-          ? parsePathWithVariables(route.path)
-          : route.path;
-
+      if (methodVerb === 'delete') {
+        const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
         const { responses } = buildApiResponses(attributes, route, hasPathParams);
-        const { requestBody } = buildApiRequests(attributes, route);
-        _.set(acc.paths, `${routePath}.put.responses`, responses);
-        _.set(acc.paths, `${routePath}.put.requestBody`, requestBody);
-        _.set(acc.paths, `${routePath}.put.tags`, [_.upperFirst(route.info.apiName)]);
+        _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
+        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(route.info.apiName)]);
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.put.parameters`, pathParams);
-        }
-      }
-
-      if (route.method === 'DELETE') {
-        const routePath = route.path.includes(':')
-          ? parsePathWithVariables(route.path)
-          : route.path;
-        const { responses } = buildApiResponses(attributes, route, hasPathParams);
-        _.set(acc.paths, `${routePath}.delete.responses`, responses);
-        _.set(acc.paths, `${routePath}.delete.tags`, [_.upperFirst(route.info.apiName)]);
-
-        if (hasPathParams) {
-          const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.delete.parameters`, pathParams);
+          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
         }
       }
 

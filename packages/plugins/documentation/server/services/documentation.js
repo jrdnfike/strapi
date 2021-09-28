@@ -108,8 +108,8 @@ module.exports = () => {
         this.getDocumentationVersion(),
         'full_documentation.json'
       );
+
       await fs.ensureFile(fullDocJsonPath);
-      // write to full doc path
       await fs.writeJson(fullDocJsonPath, { ...defaultConfig, paths }, { spaces: 2 });
     },
   };

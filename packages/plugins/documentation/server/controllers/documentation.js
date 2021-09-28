@@ -253,7 +253,6 @@ module.exports = {
     }
 
     try {
-      console.log('made it');
       await service.deleteDocumentation(version);
       ctx.send({ ok: true });
     } catch (err) {
