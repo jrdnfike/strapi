@@ -7,6 +7,12 @@ const queryParams = require('../query-params');
 const buildApiRequests = require('./build-api-requests');
 const buildApiResponses = require('./build-api-responses');
 
+/**
+ * @description Parses a route with ':variable'
+ *
+ * @param {string} routePath - The route's path property
+ * @returns '{variable}'
+ */
 const parsePathWithVariables = routePath => {
   return pathToRegexp
     .parse(routePath)
@@ -20,6 +26,13 @@ const parsePathWithVariables = routePath => {
     .join('');
 };
 
+/**
+ * @description Builds the required object for a path parameter
+ *
+ * @param {string} routePath - The route's path property
+ *
+ * @returns Swagger path params object
+ */
 const getPathParams = routePath => {
   return pathToRegexp
     .parse(routePath)
@@ -36,6 +49,14 @@ const getPathParams = routePath => {
     });
 };
 
+/**
+ *
+ * @param {array} routes - The routes for a given api or plugin
+ * @param {object} attributes - The attributes for a given api or plugin
+ * @param {string} tag - A descriptor for Swagger
+ *
+ * @returns object of swagger paths for each route
+ */
 const getPaths = (routes, attributes, tag) => {
   const paths = routes.reduce(
     (acc, route) => {
@@ -96,6 +117,16 @@ const getPaths = (routes, attributes, tag) => {
   return paths;
 };
 
+/**
+ * @description - Builds the Swagger paths object for each api
+ *
+ * @param {object} api - Information about the current api
+ * @property {string} api.name - The name of the api
+ * @property {string} api.getter - The getter for the api (api | plugin)
+ * @property {array} api.ctNames - The name of all contentTypes found on the api
+ *
+ * @returns
+ */
 module.exports = api => {
   if (!api.ctNames.length) {
     const attributes = { foo: { type: 'string ' } };

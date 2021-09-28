@@ -1,5 +1,13 @@
 'use strict';
 
+/**
+ * @description Determines the format of the data response
+ * 
+ * @param {boolean} isSingleEntity - Checks for a single entity
+ * @param {object} attributes - The attributes found on a contentType
+ 
+ * @returns object | array of attributes
+ */
 module.exports = (isSingleEntity, attributes) => {
   if (isSingleEntity) {
     return {

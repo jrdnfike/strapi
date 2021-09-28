@@ -2,6 +2,13 @@
 const _ = require('lodash');
 const getSchemaData = require('./get-schema-data');
 
+/**
+ * @description - Converts types found on attributes to OpenAPI specific data types
+ * 
+ * @param {object} attributes - The attributes found on a contentType
+ 
+ * @returns Attributes using OpenAPI acceptable data types
+ */
 const cleanSchemaAttributes = attributes => {
   // Make a copy of the attributes
   const attributesCopy = _.cloneDeep(attributes);

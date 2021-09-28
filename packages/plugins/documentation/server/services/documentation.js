@@ -74,6 +74,15 @@ module.exports = () => {
       return forms;
     },
 
+    /**
+     * @description - Gets the path for an api or plugin
+     *
+     * @param {object} api
+     * @property {string} api.name - Name of the api
+     * @property {string} api.getter - api | plugin
+     *
+     * @returns path to the api | plugin
+     */
     getApiDocumentationPath(api) {
       if (api.getter === 'plugin') {
         return path.join(strapi.config.appPath, 'src', 'extensions', api.name, 'documentation');
@@ -91,6 +100,9 @@ module.exports = () => {
       await fs.remove(path.join(this.getFullDocumentationPath(), version));
     },
 
+    /**
+     * @description - Creates the Swagger json files
+     */
     async generateFullDoc() {
       let paths = {};
       const plugins = ['email', 'upload', 'users-permissions'];

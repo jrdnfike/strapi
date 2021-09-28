@@ -4,6 +4,11 @@ const getSchemaData = require('../get-schema-data');
 const cleanSchemaAttributes = require('../clean-schema-attributes');
 const errorResponse = require('../error-response');
 
+/**
+ *
+ * @param {boolean} isSingleEntity - Checks for a single entity
+ * @returns {object} The correctly formatted meta object
+ */
 const getMeta = isSingleEntity => {
   if (isSingleEntity) {
     return { type: 'object' };
@@ -23,6 +28,15 @@ const getMeta = isSingleEntity => {
   };
 };
 
+/**
+ * @description - Builds the Swagger response object for a given api
+ *
+ * @param {object} attributes - The attributes found on a contentType
+ * @param {object} route - The current route
+ * @param {boolean} isSingleEntity - Checks for a single entity
+ *
+ * @returns The Swagger responses
+ */
 module.exports = (attributes, route, isSingleEntity = false) => {
   let schema;
   if (route.method === 'DELETE') {
