@@ -74,8 +74,12 @@ module.exports = () => {
       return forms;
     },
 
-    getApiDocumentationPath(apiName) {
-      return path.join(strapi.config.appPath, 'src', 'api', apiName, 'documentation');
+    getApiDocumentationPath(api) {
+      if (api.getter === 'plugin') {
+        return path.join(strapi.config.appPath, 'src', 'extensions', api.name, 'documentation');
+      }
+
+      return path.join(strapi.config.appPath, 'src', 'api', api.name, 'documentation');
     },
 
     async deleteDocumentation(version) {
@@ -89,15 +93,37 @@ module.exports = () => {
 
     async generateFullDoc() {
       let paths = {};
-      const apis = Object.keys(strapi.api);
-      for (const apiName of apis) {
+      const plugins = ['email', 'upload', 'users-permissions'];
+
+      const pluginsToDocument = plugins.map(plugin => {
+        return {
+          name: plugin,
+          getter: 'plugin',
+          ctNames: Object.keys(strapi.plugin(plugin).contentTypes),
+        };
+      });
+
+      const apisToDocument = Object.keys(strapi.api).map(api => {
+        return {
+          name: api,
+          getter: 'api',
+          ctNames: Object.keys(strapi.api[api].contentTypes),
+        };
+      });
+
+      const apis = [...apisToDocument, ...pluginsToDocument];
+
+      for (const api of apis) {
+        const apiName = api.name;
         const apiDirPath = path.join(
-          this.getApiDocumentationPath(apiName),
+          this.getApiDocumentationPath(api),
           this.getDocumentationVersion()
         );
+
         const apiDocPath = path.join(apiDirPath, `${apiName}.json`);
+
         await fs.ensureFile(apiDocPath);
-        const apiPathsObject = builApiEndpointPath(apiName);
+        const apiPathsObject = builApiEndpointPath(api);
 
         await fs.writeJson(apiDocPath, apiPathsObject, { spaces: 2 });
         paths = { ...paths, ...apiPathsObject.paths };

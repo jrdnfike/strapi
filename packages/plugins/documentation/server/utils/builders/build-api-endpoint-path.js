@@ -36,10 +36,7 @@ const getPathParams = routePath => {
     });
 };
 
-module.exports = apiName => {
-  const attributes = strapi.contentType(`api::${apiName}.${apiName}`).attributes;
-  const routes = strapi.api[apiName].routes[apiName].routes;
-
+const getPaths = (routes, attributes, tag) => {
   const paths = routes.reduce(
     (acc, route) => {
       const hasPathParams = route.path.includes('/:');
@@ -48,10 +45,12 @@ module.exports = apiName => {
       if (methodVerb === 'get') {
         const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
 
-        // Use pathParams to distinguish between single entity vs list of entities
+        // FIXME:
+        // Using pathParams to distinguish between single entity vs list of entities
+        // is not reliable
         const { responses } = buildApiResponses(attributes, route, hasPathParams);
         _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
-        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(route.info.apiName)]);
+        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
@@ -69,7 +68,7 @@ module.exports = apiName => {
 
         _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
         _.set(acc.paths, `${routePath}.${methodVerb}.requestBody`, requestBody);
-        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(route.info.apiName)]);
+        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
@@ -81,7 +80,7 @@ module.exports = apiName => {
         const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
         const { responses } = buildApiResponses(attributes, route, hasPathParams);
         _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
-        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(route.info.apiName)]);
+        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
@@ -95,4 +94,27 @@ module.exports = apiName => {
   );
 
   return paths;
+};
+
+module.exports = api => {
+  if (!api.ctNames.length) {
+    const attributes = { foo: { type: 'string ' } };
+    // No contenType because it's uses admin routes?
+    const routes = strapi.plugin(api.name).routes['admin'].routes;
+
+    return getPaths(routes, attributes, api.name);
+  }
+
+  for (const contentTypeName of api.ctNames) {
+    const contentType = strapi.contentType(`${api.getter}::${api.name}.${contentTypeName}`);
+    const attributes = contentType.attributes;
+
+    const routes =
+      api.getter === 'plugin'
+        ? strapi.plugin(api.name).routes['content-api'].routes
+        : strapi.api[api.name].routes[contentTypeName].routes;
+
+    const tag = api.name === contentTypeName ? api.name : `${api.name} - ${contentTypeName}`;
+    return getPaths(routes, attributes, tag);
+  }
 };
