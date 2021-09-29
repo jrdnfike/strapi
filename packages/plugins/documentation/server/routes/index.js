@@ -6,10 +6,11 @@ module.exports = [
     path: '/',
     handler: 'Documentation.index',
     config: {
-      policies: [
-        'plugin::documentation.index',
-        { name: 'admin::hasPermissions', options: { actions: ['plugin::documentation.read'] } },
-      ],
+      auth: false,
+      // middlewares: [restrictAccess],
+      // policies: [
+      //   { name: 'admin::hasPermissions', options: { actions: ['plugin::documentation.read'] } },
+      // ],
     },
   },
   {
@@ -18,10 +19,10 @@ module.exports = [
     handler: 'Documentation.index',
     config: {
       auth: false,
-      policies: [
-        'plugin::documentation.index',
-        { name: 'admin::hasPermissions', options: { actions: ['plugin::documentation.read'] } },
-      ],
+      // middlewares: [restrictAccess],
+      // policies: [
+      //   { name: 'admin::hasPermissions', options: { actions: ['plugin::documentation.read'] } },
+      // ],
     },
   },
   {
