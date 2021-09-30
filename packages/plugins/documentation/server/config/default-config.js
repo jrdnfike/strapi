@@ -21,6 +21,7 @@ module.exports = {
     path: '/documentation',
     showGeneratedFiles: true,
     generateDefaultResponse: true,
+    plugins: ['email', 'upload', 'users-permissions'],
   },
   servers: [
     {

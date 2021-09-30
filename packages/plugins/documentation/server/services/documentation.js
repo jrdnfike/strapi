@@ -92,21 +92,16 @@ module.exports = () => {
     },
 
     async deleteDocumentation(version) {
-      const apis = Object.keys(strapi.api);
-      for (const apiName of apis) {
-        await fs.remove(path.join(this.getApiDocumentationPath(apiName), version));
+      const apis = this.getPluginAndApiInfo();
+      for (const api of apis) {
+        await fs.remove(path.join(this.getApiDocumentationPath(api), version));
       }
 
       await fs.remove(path.join(this.getFullDocumentationPath(), version));
     },
 
-    /**
-     * @description - Creates the Swagger json files
-     */
-    async generateFullDoc() {
-      let paths = {};
-      const plugins = ['email', 'upload', 'users-permissions'];
-
+    getPluginAndApiInfo() {
+      const plugins = docPlugin.config('x-strapi-config.plugins');
       const pluginsToDocument = plugins.map(plugin => {
         return {
           name: plugin,
@@ -123,7 +118,16 @@ module.exports = () => {
         };
       });
 
-      const apis = [...apisToDocument, ...pluginsToDocument];
+      return [...apisToDocument, ...pluginsToDocument];
+    },
+
+    /**
+     * @description - Creates the Swagger json files
+     */
+    async generateFullDoc() {
+      let paths = {};
+
+      const apis = this.getPluginAndApiInfo();
 
       for (const api of apis) {
         const apiName = api.name;

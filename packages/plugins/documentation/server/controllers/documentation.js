@@ -228,7 +228,7 @@ module.exports = {
 
   async deleteDoc(ctx) {
     strapi.reload.isWatching = false;
-    const service = strapi.plugins.documentation.services.documentation;
+    const service = strapi.plugin('documentation').service('documentation');
     const documentationVersions = service.getDocumentationVersions().map(el => el.version);
 
     const {
