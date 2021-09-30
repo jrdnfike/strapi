@@ -107,7 +107,6 @@ module.exports = api => {
   if (!api.ctNames.length && api.getter === 'plugin') {
     // Set arbitrary attributes
     const attributes = { foo: { type: 'string' } };
-    // No contenType because it uses admin routes?
     const routes = strapi.plugin(api.name).routes['admin'].routes;
 
     return getPaths(routes, attributes, api.name);
