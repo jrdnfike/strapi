@@ -128,7 +128,6 @@ module.exports = () => {
       let paths = {};
 
       const apis = this.getPluginAndApiInfo();
-
       for (const api of apis) {
         const apiName = api.name;
         const apiDirPath = path.join(

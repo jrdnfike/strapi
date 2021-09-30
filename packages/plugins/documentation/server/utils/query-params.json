@@ -78,25 +78,5 @@
     "schema": {
       "type": "string"
     }
-  },
-  {
-    "name": "filters[field][operator]=value",
-    "in": "query",
-    "description": "Returns entities matching filter",
-    "deprecated": false,
-    "required": false,
-    "style": "deepObject",
-    "explode": true,
-    "schema": {
-      "type": "object",
-      "properties": {
-        "field": {
-          "type": "string"
-        },
-        "operator": {
-          "type": "string"
-        }
-      }
-    }
   }
 ]

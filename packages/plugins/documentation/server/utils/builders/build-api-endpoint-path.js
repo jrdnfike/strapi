@@ -64,50 +64,25 @@ const getPaths = (routes, attributes, tag) => {
       const isListOfEntities = route.handler.split('.').pop() === 'find';
       const hasPathParams = route.path.includes('/:');
       const methodVerb = route.method.toLowerCase();
+      const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
 
-      if (methodVerb === 'get') {
-        const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
+      const { responses } = buildApiResponses(attributes, route, isListOfEntities);
+      _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
+      _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
 
-        const { responses } = buildApiResponses(attributes, route, isListOfEntities);
-        _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
-        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
+      if (isListOfEntities) {
+        _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, queryParams);
+      }
 
-        if (isListOfEntities) {
-          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, queryParams);
-        }
-
-        if (hasPathParams) {
-          const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
-        }
+      if (hasPathParams) {
+        const pathParams = getPathParams(route.path);
+        _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
       }
 
       if (methodVerb === 'post' || methodVerb === 'put') {
-        const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
-
-        const { responses } = buildApiResponses(attributes, route, isListOfEntities);
         const { requestBody } = buildApiRequests(attributes, route);
 
-        _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
         _.set(acc.paths, `${routePath}.${methodVerb}.requestBody`, requestBody);
-        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
-
-        if (hasPathParams) {
-          const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
-        }
-      }
-
-      if (methodVerb === 'delete') {
-        const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
-        const { responses } = buildApiResponses(attributes, route, isListOfEntities);
-        _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
-        _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
-
-        if (hasPathParams) {
-          const pathParams = getPathParams(route.path);
-          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
-        }
       }
 
       return acc;

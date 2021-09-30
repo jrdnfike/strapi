@@ -34,12 +34,7 @@ const cleanSchemaAttributes = attributes => {
         break;
       }
       case 'json': {
-        attributesCopy[prop] = {
-          type: 'object',
-          properties: {
-            foo: { type: 'string' },
-          },
-        };
+        attributesCopy[prop] = {};
         break;
       }
       case 'uid': {
@@ -76,10 +71,7 @@ const cleanSchemaAttributes = attributes => {
         attributesCopy[prop] = {
           type: 'object',
           properties: {
-            data: getSchemaData(isListOfEntities, {
-              type: 'object',
-              properties: { foo: 'string' },
-            }),
+            data: getSchemaData(isListOfEntities, {}),
           },
         };
 
