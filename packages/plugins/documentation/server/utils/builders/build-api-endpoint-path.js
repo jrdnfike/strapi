@@ -53,38 +53,39 @@ const getPathParams = routePath => {
  *
  * @param {array} routes - The routes for a given api or plugin
  * @param {object} attributes - The attributes for a given api or plugin
- * @param {string} tag - A descriptor for Swagger
+ * @param {string} tag - A descriptor for OpenAPI
  *
- * @returns object of swagger paths for each route
+ * @returns object of OpenAPI paths for each route
  */
 const getPaths = (routes, attributes, tag) => {
   const paths = routes.reduce(
     (acc, route) => {
+      // TODO: Find a more reliable way to determine list of entities vs a single entity
+      const isListOfEntities = route.handler.split('.').pop() === 'find';
       const hasPathParams = route.path.includes('/:');
       const methodVerb = route.method.toLowerCase();
 
       if (methodVerb === 'get') {
         const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
 
-        // FIXME:
-        // Using pathParams to distinguish between single entity vs list of entities
-        // is not reliable
-        const { responses } = buildApiResponses(attributes, route, hasPathParams);
+        const { responses } = buildApiResponses(attributes, route, isListOfEntities);
         _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
         _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
+
+        if (isListOfEntities) {
+          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, queryParams);
+        }
 
         if (hasPathParams) {
           const pathParams = getPathParams(route.path);
           _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, pathParams);
-        } else {
-          _.set(acc.paths, `${routePath}.${methodVerb}.parameters`, queryParams);
         }
       }
 
       if (methodVerb === 'post' || methodVerb === 'put') {
         const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
 
-        const { responses } = buildApiResponses(attributes, route, hasPathParams);
+        const { responses } = buildApiResponses(attributes, route, isListOfEntities);
         const { requestBody } = buildApiRequests(attributes, route);
 
         _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
@@ -99,7 +100,7 @@ const getPaths = (routes, attributes, tag) => {
 
       if (methodVerb === 'delete') {
         const routePath = hasPathParams ? parsePathWithVariables(route.path) : route.path;
-        const { responses } = buildApiResponses(attributes, route, hasPathParams);
+        const { responses } = buildApiResponses(attributes, route, isListOfEntities);
         _.set(acc.paths, `${routePath}.${methodVerb}.responses`, responses);
         _.set(acc.paths, `${routePath}.${methodVerb}.tags`, [_.upperFirst(tag)]);
 
@@ -128,23 +129,28 @@ const getPaths = (routes, attributes, tag) => {
  * @returns
  */
 module.exports = api => {
-  if (!api.ctNames.length) {
-    const attributes = { foo: { type: 'string ' } };
-    // No contenType because it's uses admin routes?
+  if (!api.ctNames.length && api.getter === 'plugin') {
+    // Set arbitrary attributes
+    const attributes = { foo: { type: 'string' } };
+    // No contenType because it uses admin routes?
     const routes = strapi.plugin(api.name).routes['admin'].routes;
 
     return getPaths(routes, attributes, api.name);
   }
 
+  // An api could have multiple contentTypes
   for (const contentTypeName of api.ctNames) {
-    const contentType = strapi.contentType(`${api.getter}::${api.name}.${contentTypeName}`);
-    const attributes = contentType.attributes;
+    // Get the attributes found on the api's contentType
+    const attributes = strapi.contentType(`${api.getter}::${api.name}.${contentTypeName}`)
+      .attributes;
 
+    // Get the routes for the current api
     const routes =
       api.getter === 'plugin'
         ? strapi.plugin(api.name).routes['content-api'].routes
         : strapi.api[api.name].routes[contentTypeName].routes;
 
+    // Parse an identifier for OpenAPI tag if the api name and contentType name don't match
     const tag = api.name === contentTypeName ? api.name : `${api.name} - ${contentTypeName}`;
     return getPaths(routes, attributes, tag);
   }

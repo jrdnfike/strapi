@@ -9,23 +9,23 @@ const errorResponse = require('../error-response');
  * @param {boolean} isSingleEntity - Checks for a single entity
  * @returns {object} The correctly formatted meta object
  */
-const getMeta = isSingleEntity => {
-  if (isSingleEntity) {
-    return { type: 'object' };
-  }
-
-  return {
-    properties: {
-      pagination: {
-        properties: {
-          page: { type: 'integer' },
-          pageSize: { type: 'integer', minimum: 25 },
-          pageCount: { type: 'integer', maximum: 1 },
-          total: { type: 'integer' },
+const getMeta = isListOfEntities => {
+  if (isListOfEntities) {
+    return {
+      properties: {
+        pagination: {
+          properties: {
+            page: { type: 'integer' },
+            pageSize: { type: 'integer', minimum: 25 },
+            pageCount: { type: 'integer', maximum: 1 },
+            total: { type: 'integer' },
+          },
         },
       },
-    },
-  };
+    };
+  }
+
+  return { type: 'object' };
 };
 
 /**
@@ -33,11 +33,11 @@ const getMeta = isSingleEntity => {
  *
  * @param {object} attributes - The attributes found on a contentType
  * @param {object} route - The current route
- * @param {boolean} isSingleEntity - Checks for a single entity
+ * @param {boolean} isListOfEntities - Checks for a list of entitities
  *
  * @returns The Swagger responses
  */
-module.exports = (attributes, route, isSingleEntity = false) => {
+module.exports = (attributes, route, isListOfEntities = false) => {
   let schema;
   if (route.method === 'DELETE') {
     schema = {
@@ -47,8 +47,8 @@ module.exports = (attributes, route, isSingleEntity = false) => {
   } else {
     schema = {
       properties: {
-        data: getSchemaData(isSingleEntity, cleanSchemaAttributes(attributes)),
-        meta: getMeta(isSingleEntity),
+        data: getSchemaData(isListOfEntities, cleanSchemaAttributes(attributes)),
+        meta: getMeta(isListOfEntities),
       },
     };
   }
