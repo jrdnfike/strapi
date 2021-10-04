@@ -11,13 +11,13 @@ pipeline {
     stages {
         stage('Setup and Build') {
             steps {
-                sh 'npm install --global yarn'
+                sh 'npm install yarn'
 		sh 'npm run setup'
             }
         }
         stage('Unit Test and Code Coverage') { 
             steps {
-		sh 'npm install --global codecov'
+		sh 'npm install codecov'
 		sh 'npm run test:unit-codecov'
             }
         }
