@@ -9,16 +9,16 @@ pipeline {
         CI = 'true' 
     }
     stages {
-        stage('Build') {
+        stage('Setup and Build') {
             steps {
-                sh 'npm install'
+                sh 'npm install --global yarn'
+		sh 'npm run setup'
             }
         }
-        stage('Test') { 
+        stage('Unit Test and Code Coverage') { 
             steps {
-		dir("./test") {
-                    sh 'npm test'
-		}
+		sh 'npm install --global codecov'
+		sh 'npm run test:unit-codecov'
             }
         }
     }
