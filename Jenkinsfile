@@ -22,7 +22,8 @@ pipeline {
         stage('Unit Test and Code Coverage') { 
             steps {
 		//sh 'npm install codecov jest'
-		sh 'npm run test:unit-codecov'
+		//sh 'npm run test:unit-codecov'
+		sh 'npm run test:front:ce'
             }
         }
     }
