@@ -12,6 +12,9 @@ pipeline {
         stage('Setup and Build') {
             steps {
                 sh 'npm install yarn'
+
+		// Ensure no package conflicts with yarn
+		sh 'rm package-lock.json'
 		sh 'npm run setup'
             }
         }
