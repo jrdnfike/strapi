@@ -76,7 +76,7 @@
     "test:front:update:ce": "cross-env NODE_ENV=test IS_EE=false jest --config ./jest.config.front.js --u",
     "test:snyk": "snyk test",
     "test:unit": "jest --verbose",
-    "test:unit-codecov": "jest --verbose && codecov",
+    "test:unit-codecov": "npm run jest --verbose && npm run codecov",
     "test:e2e": "FORCE_COLOR=true jest --config jest.config.e2e.js --verbose --runInBand --testRunner=jest-circus/runner",
     "test:generate-app": "node test/create-test-app.js",
     "doc:api": "node scripts/open-api/serve.js"
