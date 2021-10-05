@@ -10,6 +10,7 @@
     "babel-eslint": "^10.0.0",
     "chalk": "4.1.1",
     "chokidar": "3.5.1",
+    "codecov": "3.8.3",
     "cross-env": "^7.0.3",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.15.6",
@@ -76,7 +77,7 @@
     "test:front:update:ce": "cross-env NODE_ENV=test IS_EE=false jest --config ./jest.config.front.js --u",
     "test:snyk": "snyk test",
     "test:unit": "jest --verbose",
-    "test:unit-codecov": "npm run jest --verbose && npm run codecov",
+    "test:unit-codecov": "jest --verbose && codecov",
     "test:e2e": "FORCE_COLOR=true jest --config jest.config.e2e.js --verbose --runInBand --testRunner=jest-circus/runner",
     "test:generate-app": "node test/create-test-app.js",
     "doc:api": "node scripts/open-api/serve.js"
@@ -124,7 +125,7 @@
     ]
   },
   "jest": {
-      "coverageDirectory": "./coverage/",
-      "collectCoverage": true
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }

@@ -6,7 +6,8 @@ pipeline {
         }
     }
     environment {
-        CI = 'true' 
+        CI = 'true'
+	CODECOV_TOKEN='31be7cd7-381c-4d57-870b-051b1bc7b3f1' 
     }
     stages {
         stage('Setup and Build') {
@@ -20,7 +21,7 @@ pipeline {
         }
         stage('Unit Test and Code Coverage') { 
             steps {
-		sh 'npm install codecov'
+		//sh 'npm install codecov jest'
 		sh 'npm run test:unit-codecov'
             }
         }
